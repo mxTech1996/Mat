@@ -1,52 +1,46 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { navData } from '@/data';
-import { Navbar as NavbarV2, theme } from 'ecommerce-mxtech';
-import { useInformation } from '@/store/useInformation';
+import { dataSite } from '@/data';
+import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 
-const { useToken } = theme;
+export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
 
-const Navbar = () => {
-  const { dataSite } = useInformation();
-  const router = useRouter();
-  const {
-    token: { colorPrimary },
-  } = useToken();
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <NavbarV2
-      linksProps={{
-        variant: 'underline',
-        align: 'left',
+    <header
+      className='fixed top-0 left-0 w-full z-50 transition-colors duration-300'
+      style={{
+        backgroundColor: isScrolled ? '#F0FAF4' : '#FFFFFF',
+        boxShadow: isScrolled ? '0 2px 10px rgba(0,0,0,0.1)' : 'none',
       }}
-      textColor='black'
-      withLogo={true}
-      imageProps={{
-        src: dataSite.iconImage,
-        className: 'w-28',
-      }}
-      styleTitle={{
-        fontWeight: 'bold',
-        fontSize: 16,
-        color: 'black',
-      }}
-      links={navData}
-      onClickProduct={(product) => {
-        router.push(`/product/${product.id}`);
-      }}
-      buttonCartProps={{
-        onClick: () => router.push('/my-cart'),
-      }}
-      buttonContactProps={{
-        onClick: () => router.push('/more-information'),
-      }}
-      onRedirect={(path) => router.push(path)}
-      styleHeader={{
-        height: 100,
-        color: 'black',
-      }}
-    />
+    >
+      <div className='max-w-7xl mx-auto flex items-center justify-between p-4'>
+        <Link href='/' className='flex items-center'>
+          <img src={dataSite.iconImage} alt='Logo' className='h-16 w-16 mr-2' />
+          <span className='text-2xl font-bold text-green-500'>Mat</span>
+        </Link>
+        <nav className='flex space-x-6'>
+          <a href='/#products'>Products</a>
+          <a href='/#about'>About Us</a>
+          <a href='/#services'>Services</a>
+          <a href='/#testimonials'>Testimonials</a>
+          <a href='/more-information'>Contact Us</a>
+          <button
+            onClick={() => (window.location.href = '/my-cart')}
+            className='ml-4 bg-black text-white px-4 py-2 rounded'
+          >
+            My Cart
+          </button>
+        </nav>
+      </div>
+    </header>
   );
-};
-
-export default Navbar;
+}
